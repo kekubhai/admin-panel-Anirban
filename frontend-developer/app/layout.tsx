@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProviderWrapper } from './auth/AuthProviderWrapper'
 import { ErrorProvider } from './contexts/ErrorContext'
-import { ProtectedRoute } from './auth/ProtectedRoute'
+
 import { ThemeProvider } from './contexts/ThemeContext'
 import { AgentConfigProvider } from './contexts/AgentConfigContext'
 
@@ -31,15 +31,15 @@ export default function RootLayout({
       <body className={`${inter.className} dark:bg-gray-900 dark:text-white min-h-screen overflow-x-hidden`}>
 
         <ThemeProvider>
-          <AgentConfigProvider>
-            <AuthProviderWrapper>
+          <>
+          <>
               <ErrorProvider>
-                <ProtectedRoute>
+                
                   {children}
-                </ProtectedRoute>
+                
               </ErrorProvider>
-            </AuthProviderWrapper>
-          </AgentConfigProvider>
+            </>
+          </>
         </ThemeProvider>
       </body>
     </html>

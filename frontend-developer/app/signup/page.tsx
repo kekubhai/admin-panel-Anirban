@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Mail, Eye, EyeOff, User, Lock, Code } from 'lucide-react';
-import { useAuthFrontendApis } from '@propelauth/frontend-apis-react';
+// COMMENTED FOR DEV - to see pages without auth
+// import { useAuthFrontendApis } from '@propelauth/frontend-apis-react';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import Link from 'next/link';
 import { useTheme } from '../contexts/ThemeContext';
@@ -29,7 +30,9 @@ export default function SignUp() {
     confirmPassword: '',
   });
   const { showError, showSuccess } = useErrorHandler();
-  const { signup } = useAuthFrontendApis();
+  // COMMENTED FOR DEV - mock auth functions
+  // const { signup } = useAuthFrontendApis();
+  const signup = async (_params: any) => ({ handle: async (handlers: any) => handlers.success?.() });
   const { isDarkMode } = useTheme();
 
   const handleGoogleSignUp = () => {

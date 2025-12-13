@@ -11,7 +11,8 @@ export function AuthProviderWrapper({ children }: { children: React.ReactNode })
     setIsClient(true);
   }, []);
 
-  const AUTH_URL = process.env.NEXT_PUBLIC_DEVELOPMENT_PROPELAUTH_URL;
+  // Use real AUTH_URL or a placeholder for dev (so AuthProvider context exists)
+  const AUTH_URL = process.env.NEXT_PUBLIC_DEVELOPMENT_PROPELAUTH_URL || 'https://placeholder.propelauthtest.com';
 
   // Prevent hydration mismatch by not rendering until client-side
   if (!isClient) {
@@ -22,12 +23,8 @@ export function AuthProviderWrapper({ children }: { children: React.ReactNode })
     );
   }
 
-  if (!AUTH_URL) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-600">Authentication configuration error</div>
-      </div>
-    );
+  if (!process.env.NEXT_PUBLIC_DEVELOPMENT_PROPELAUTH_URL) {
+    console.warn('NEXT_PUBLIC_DEVELOPMENT_PROPELAUTH_URL not set - using placeholder for dev');
   }
 
   return (
