@@ -1,10 +1,48 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Bot, Globe, Shield, Zap, ArrowRight, Check, X, Activity } from 'lucide-react';
-import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Bot, Globe, Shield, Zap, ArrowRight, Check, X, Activity, Phone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { DottedMap } from '@/components/ui/dotted-map';
+import WorldMap from '@/components/ui/world-map';
+import { MagicCard } from '@/components/ui/magic-card';
+
+// Call popup locations around the world
+const callLocations = [
+  { id: 1, lat: 40.7128, lng: -74.006, city: 'New York', country: 'USA', duration: '2:34' },
+  { id: 2, lat: 51.5074, lng: -0.1278, city: 'London', country: 'UK', duration: '1:45' },
+  { id: 3, lat: 35.6762, lng: 139.6503, city: 'Tokyo', country: 'Japan', duration: '3:12' },
+  { id: 4, lat: -33.8688, lng: 151.2093, city: 'Sydney', country: 'Australia', duration: '0:58' },
+  { id: 5, lat: 19.076, lng: 72.8777, city: 'Mumbai', country: 'India', duration: '4:21' },
+  { id: 6, lat: 55.7558, lng: 37.6173, city: 'Moscow', country: 'Russia', duration: '1:33' },
+  { id: 7, lat: -23.5505, lng: -46.6333, city: 'São Paulo', country: 'Brazil', duration: '2:08' },
+  { id: 8, lat: 1.3521, lng: 103.8198, city: 'Singapore', country: 'Singapore', duration: '1:55' },
+  { id: 9, lat: 48.8566, lng: 2.3522, city: 'Paris', country: 'France', duration: '3:44' },
+  { id: 10, lat: 25.2048, lng: 55.2708, city: 'Dubai', country: 'UAE', duration: '2:17' },
+];
 
 const Features = () => {
+  const [activePopups, setActivePopups] = useState<typeof callLocations>([]);
+
+  // Cycle through call popups
+  useEffect(() => {
+    let currentIndex = 0;
+    
+    const showNextPopup = () => {
+      const location = callLocations[currentIndex];
+      setActivePopups(prev => [...prev, location].slice(-2)); // Keep max 2 popups
+      currentIndex = (currentIndex + 1) % callLocations.length;
+    };
+
+    // Show first popup immediately
+    showNextPopup();
+    
+    // Show new popup every 3 seconds (slower for better performance)
+    const interval = setInterval(showNextPopup, 3000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -40,34 +78,93 @@ const Features = () => {
     'Action Triggered: Refund $49.99',
   ];
 
-    return (
+  // Convert lat/lng to approximate x/y positions for popup positioning
+  const getPopupPosition = (lat: number, lng: number) => {
+    const x = ((lng + 180) / 360) * 100;
+    const y = ((90 - lat) / 180) * 100;
+    return { x: `${x}%`, y: `${y}%` };
+  };
+
+  return (
     <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#0a0a0a] to-[#0d1020]">
       <div className="max-w-7xl mx-auto">
-        {/* Hero Header */}
+        {/* Hero Header with Map */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mb-20"
+          className="mb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
         >
-          
-          <h2 className="text-6xl sm:text-7xl lg:text-8xl font-bold mb-8 leading-tight">
-            Voice Agents That Act,
-            <br />
-            <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Not Just Respond
-            </span>
-                    </h2>
-          <p className="text-2xl sm:text-3xl text-gray-200 max-w-3xl mb-8 leading-relaxed">
-            Design, deploy, and monitor AI voice agents that handle real conversations – across calls, workflows, and tools.
-          </p>
-          <div className="flex items-center gap-6 text-base text-gray-300">
-            <span>&lt; 280ms latency</span>
-            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-            <span>120+ integrations</span>
-            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-            <span>50M+ monthly calls</span>
+          {/* Left: Text Content */}
+          <div>
+            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+              Voice Agents That Act,
+              <br />
+              <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                Not Just Respond
+              </span>
+            </h2>
+            <p className="text-xl sm:text-2xl text-gray-200 max-w-xl mb-8 leading-relaxed">
+              Design, deploy, and monitor AI voice agents that handle real conversations – across calls, workflows, and tools.
+            </p>
+            <div className="flex flex-wrap items-center gap-4 text-base text-gray-300">
+              <span>&lt; 280ms latency</span>
+              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+              <span>120+ integrations</span>
+              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+              <span>50M+ monthly calls</span>
+            </div>
+          </div>
+
+          {/* Right: Dotted Map with Call Popups */}
+          <div className="relative h-[400px] border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent rounded-lg overflow-hidden">
+            {/* Map Background */}
+            <div className="border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent rounded-lg overflow-hidden">
+              <WorldMap />
+            </div>
+
+            {/* Animated Call Popups */}
+            <AnimatePresence mode="popLayout">
+              {activePopups.map((popup, index) => {
+                const pos = getPopupPosition(popup.lat, popup.lng);
+                return (
+                  <motion.div
+                    key={`${popup.id}-${index}-${Date.now()}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute z-10"
+                    style={{ left: pos.x, top: pos.y, transform: 'translate(-50%, -50%)' }}
+                  >
+                    {/* Simple pulse indicator */}
+                    <div className="absolute -left-1 -top-1 w-3 h-3 bg-blue-500/50 rounded-full animate-ping" />
+                    
+                    {/* Popup Card */}
+                    <div className="bg-slate-900/95 border border-slate-700 rounded-lg px-3 py-2 shadow-xl min-w-[130px]">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <span className="text-xs font-semibold text-white">{popup.city}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-slate-400">{popup.country}</span>
+                        <div className="flex items-center gap-1">
+                          <Phone className="w-3 h-3 text-blue-400" />
+                          <span className="text-[10px] font-mono text-blue-400">{popup.duration}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+
+            {/* Live indicator */}
+            <div className="absolute top-4 left-4 flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-xs font-medium text-white">LIVE</span>
+            </div>
           </div>
         </motion.div>
 
@@ -160,47 +257,128 @@ const Features = () => {
             variants={itemVariants}
             className="group relative border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent p-8 hover:border-white/10 transition-all duration-300"
           >
-            <h3 className="text-2xl font-semibold mb-8 text-white">Latency & Audio Flow Visualization</h3>
-            <div className="h-24 border border-slate-800 bg-slate-950/50 p-4 flex items-center justify-center overflow-hidden">
+            <h3 className="text-2xl font-semibold mb-8 text-white">Real-Time Performance</h3>
+            <div className="h-48 border border-slate-800/50 bg-[#0a0a14] rounded-lg p-6 relative overflow-hidden">
               <svg
                 className="w-full h-full"
-                viewBox="0 0 400 100"
+                viewBox="0 0 400 160"
                 xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="none"
+                preserveAspectRatio="xMidYMid meet"
               >
-                {/* Background grid lines */}
-                <line x1="0" y1="50" x2="400" y2="50" stroke="rgb(71, 85, 105)" strokeWidth="0.5" opacity="0.3" />
+                {/* Define gradient for area fill */}
+                <defs>
+                  <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgb(59, 130, 246)" stopOpacity="0.5" />
+                    <stop offset="50%" stopColor="rgb(37, 99, 235)" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="rgb(29, 78, 216)" stopOpacity="0" />
+                  </linearGradient>
+                  
+                  {/* Glow effect for line */}
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
                 
-                {/* Complex waveform with multiple ridges and grooves */}
+                {/* Filled area under curve */}
                 <motion.path
-                  d="M 0 50 L 5 48 L 10 45 L 15 50 L 20 55 L 25 52 L 30 50 L 35 35 L 40 20 L 45 15 L 50 25 L 55 40 L 60 50 L 65 58 L 70 60 L 75 58 L 80 50 L 85 42 L 90 38 L 95 40 L 100 45 L 105 50 L 110 48 L 115 45 L 120 30 L 125 15 L 130 10 L 135 8 L 140 12 L 145 25 L 150 40 L 155 52 L 160 60 L 165 65 L 170 68 L 175 65 L 180 58 L 185 50 L 190 45 L 195 42 L 200 40 L 205 42 L 210 48 L 215 52 L 220 50 L 225 45 L 230 38 L 235 35 L 240 38 L 245 45 L 250 50 L 255 48 L 260 45 L 265 30 L 270 18 L 275 12 L 280 15 L 285 28 L 290 42 L 295 52 L 300 58 L 305 60 L 310 58 L 315 52 L 320 48 L 325 47 L 330 48 L 335 50 L 340 52 L 345 50 L 350 48 L 355 40 L 360 35 L 365 38 L 370 45 L 375 50 L 380 52 L 385 50 L 390 48 L 395 47 L 400 50"
-                  stroke="rgb(148, 163, 184)"
-                  strokeWidth="1.5"
+                  d="M 0 140 L 0 120 Q 40 110, 80 115 T 160 105 Q 200 90, 240 95 T 320 75 L 400 60 L 400 160 L 0 160 Z"
+                  fill="url(#areaGradient)"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                />
+                
+                {/* Main line */}
+                <motion.path
+                  d="M 0 120 Q 40 110, 80 115 T 160 105 Q 200 90, 240 95 T 320 75 L 400 60"
+                  stroke="rgb(96, 165, 250)"
+                  strokeWidth="2.5"
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  filter="url(#glow)"
                   initial={{ pathLength: 0, opacity: 0 }}
                   whileInView={{ pathLength: 1, opacity: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 2.5, ease: "easeInOut" }}
+                  transition={{ duration: 2, ease: "easeOut" }}
                 />
                 
-                {/* Glowing effect overlay */}
-                <motion.path
-                  d="M 0 50 L 5 48 L 10 45 L 15 50 L 20 55 L 25 52 L 30 50 L 35 35 L 40 20 L 45 15 L 50 25 L 55 40 L 60 50 L 65 58 L 70 60 L 75 58 L 80 50 L 85 42 L 90 38 L 95 40 L 100 45 L 105 50 L 110 48 L 115 45 L 120 30 L 125 15 L 130 10 L 135 8 L 140 12 L 145 25 L 150 40 L 155 52 L 160 60 L 165 65 L 170 68 L 175 65 L 180 58 L 185 50 L 190 45 L 195 42 L 200 40 L 205 42 L 210 48 L 215 52 L 220 50 L 225 45 L 230 38 L 235 35 L 240 38 L 245 45 L 250 50 L 255 48 L 260 45 L 265 30 L 270 18 L 275 12 L 280 15 L 285 28 L 290 42 L 295 52 L 300 58 L 305 60 L 310 58 L 315 52 L 320 48 L 325 47 L 330 48 L 335 50 L 340 52 L 345 50 L 350 48 L 355 40 L 360 35 L 365 38 L 370 45 L 375 50 L 380 52 L 385 50 L 390 48 L 395 47 L 400 50"
-                  stroke="rgb(148, 163, 184)"
-                  strokeWidth="3"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  opacity="0.2"
-                  filter="blur(2px)"
-                  initial={{ pathLength: 0 }}
-                  whileInView={{ pathLength: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 2.5, ease: "easeInOut" }}
-                />
+                {/* Data points */}
+                {[
+                  { x: 80, y: 115, value: '2,847' },
+                  { x: 160, y: 105, value: '3,124' },
+                  { x: 240, y: 95, value: '3,833' },
+                  { x: 320, y: 75, value: '4,291' },
+                ].map((point, index) => (
+                  <g key={index}>
+                    <motion.circle
+                      cx={point.x}
+                      cy={point.y}
+                      r="4"
+                      fill="rgb(96, 165, 250)"
+                      stroke="rgb(30, 58, 138)"
+                      strokeWidth="2"
+                      initial={{ scale: 0, opacity: 0 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.5 + index * 0.2, duration: 0.4 }}
+                      className="cursor-pointer"
+                    />
+                    {index === 2 && (
+                      <motion.g
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 1.5 }}
+                      >
+                        {/* Vertical line indicator */}
+                        <line
+                          x1={point.x}
+                          y1={point.y}
+                          x2={point.x}
+                          y2="140"
+                          stroke="rgb(59, 130, 246)"
+                          strokeWidth="1.5"
+                          strokeDasharray="4,4"
+                          opacity="0.5"
+                        />
+                        {/* Tooltip */}
+                        <rect
+                          x={point.x - 35}
+                          y={point.y - 35}
+                          width="70"
+                          height="28"
+                          rx="6"
+                          fill="rgb(15, 23, 42)"
+                          stroke="rgb(71, 85, 105)"
+                          strokeWidth="1"
+                        />
+                        <text
+                          x={point.x}
+                          y={point.y - 15}
+                          textAnchor="middle"
+                          fill="white"
+                          fontSize="16"
+                          fontWeight="600"
+                          fontFamily="monospace"
+                        >
+                          {point.value}
+                        </text>
+                      </motion.g>
+                    )}
+                  </g>
+                ))}
               </svg>
+              
+              {/* Metric label */}
+              <div className="absolute top-4 left-4 text-xs text-slate-400 font-mono">
+                Calls / Hour
+              </div>
             </div>
           </motion.div>
 
@@ -224,16 +402,7 @@ const Features = () => {
           </motion.div>
 
           {/* Human Handoff */}
-          <motion.div
-            variants={itemVariants}
-            className="group relative border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent p-8 hover:border-white/10 transition-all duration-300"
-          >
-            <h3 className="text-2xl font-semibold mb-4 text-white">Human Handoff</h3>
-            <div className="text-xs text-slate-400 mb-6 font-mono">Escalation Rate: 6% | Avg Wait: 12s</div>
-            <div className="flex items-center justify-center h-24 border border-slate-800 bg-slate-950/50">
-              <span className="text-lg font-mono text-slate-200">Human↑₃ [»</span>
-            </div>
-          </motion.div>
+       
         </motion.div>
 
         {/* Conversation Flow */}
