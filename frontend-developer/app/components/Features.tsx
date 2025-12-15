@@ -5,8 +5,21 @@ import { Bot, Globe, Shield, Zap, ArrowRight, Check, X, Activity, Phone } from '
 import React, { useState, useEffect } from 'react';
 import { DottedMap } from '@/components/ui/dotted-map';
 import WorldMap from '@/components/ui/world-map';
-import { MagicCard } from '@/components/ui/magic-card';
 
+import { EncryptedText } from '@/components/ui/encrypted-text';
+import { ScrollVelocityContainer, ScrollVelocityRow } from '@/components/ui/scroll-based-velocity';
+const IMAGES_ROW_A = [
+  // Unicorn company logos (+ neutral stock photo for style match)
+  "https://images.unsplash.com/photo-1679065236532-09c4a500a025?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+ " https://images.unsplash.com/photo-1679403766665-67ed6cd2df30?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // ByteDance
+ "https://images.unsplash.com/photo-1716967318503-05b7064afa41?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+ // Some neutral stock images for continuity in the slider style
+
+]
+const IMAGES_ROW_B = [
+  "https://images.unsplash.com/photo-1749738456487-2af715ab65ea?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "https://plus.unsplash.com/premium_photo-1720139288219-e20aa9c8895b?q=80&w=1810&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+]
 // Call popup locations around the world
 const callLocations = [
   { id: 1, lat: 40.7128, lng: -74.006, city: 'New York', country: 'USA', duration: '2:34' },
@@ -85,7 +98,7 @@ const Features = () => {
     return { x: `${x}%`, y: `${y}%` };
   };
 
-  return (
+    return (
     <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#0a0a0a] to-[#0d1020]">
       <div className="max-w-7xl mx-auto">
         {/* Hero Header with Map */}
@@ -104,7 +117,7 @@ const Features = () => {
               <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
                 Not Just Respond
               </span>
-            </h2>
+                    </h2>
             <p className="text-xl sm:text-2xl text-gray-200 max-w-xl mb-8 leading-relaxed">
               Design, deploy, and monitor AI voice agents that handle real conversations – across calls, workflows, and tools.
             </p>
@@ -168,6 +181,224 @@ const Features = () => {
           </div>
         </motion.div>
 
+        {/* Lead Maximizer Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="mb-12 relative rounded-2xl overflow-hidden"
+        >
+          {/* Shiny border effect */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-slate-600/50 via-slate-400/30 to-slate-600/50 p-[1px]">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-slate-800/90 via-slate-900/95 to-slate-800/90" />
+          </div>
+          
+          {/* Glow effect */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-slate-500/20 via-white/10 to-slate-500/20 rounded-2xl blur-xl opacity-50" />
+          
+          <div className="relative grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-slate-800/80 via-slate-900/90 to-slate-800/80 rounded-2xl">
+            {/* Left: Visual Call Network */}
+            <div className="relative p-8 lg:p-12 min-h-[520px] overflow-hidden">
+              {/* Subtle radial gradient background */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(148,163,184,0.08)_0%,_transparent_70%)]" />
+
+              {/* Central AI Hub */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+              >
+                <div className="relative">
+                  {/* Glow ring */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500/30 to-purple-500/30 blur-xl scale-150" />
+                  <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-slate-500/50 flex items-center justify-center shadow-2xl">
+                    <div className="absolute inset-1 rounded-full bg-gradient-to-br from-slate-600/50 to-transparent" />
+                    <Bot className="w-10 h-10 text-white relative z-10" />
+                  </div>
+                  <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap text-center">
+                    <div className="text-sm font-bold text-white tracking-wide">XPECTRUM AI</div>
+                    <div className="text-xs text-slate-400">Calling prospects</div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Phone Call Cards - Sleeker design */}
+              {[
+                { phone: '(303) 555-0147', duration: '3 min 45 sec', x: '50%', y: '6%', delay: 0.4 },
+                { phone: '(202) 555-0198', duration: '2 min 15 sec', x: '12%', y: '28%', delay: 0.5 },
+                { phone: '(505) 555-0186', duration: '5 min 10 sec', x: '78%', y: '28%', delay: 0.6 },
+                { phone: '(707) 555-0164', duration: '7 min 20 sec', x: '10%', y: '72%', delay: 0.7 },
+                { phone: '(404) 555-0123', duration: '4 min 30 sec', x: '80%', y: '72%', delay: 0.8 },
+                { phone: '(606) 555-0175', duration: '6 min 5 sec', x: '50%', y: '92%', delay: 0.9 },
+              ].map((call, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: call.delay, duration: 0.4 }}
+                  className="absolute z-10"
+                  style={{ left: call.x, top: call.y, transform: 'translate(-50%, -50%)' }}
+                >
+                  <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-600/90 to-violet-600/90 border border-indigo-400/30 rounded-full px-3 py-1.5 shadow-lg shadow-indigo-500/20">
+                    <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
+                      <Phone className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">{call.phone}</div>
+                      <div className="text-[10px] text-indigo-200">{call.duration}</div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+
+              {/* Dotted Connecting Lines SVG */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: 'visible' }}>
+                <defs>
+                  <linearGradient id="dottedLineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(148, 163, 184, 0.2)" />
+                    <stop offset="50%" stopColor="rgba(148, 163, 184, 0.5)" />
+                    <stop offset="100%" stopColor="rgba(148, 163, 184, 0.2)" />
+                  </linearGradient>
+                </defs>
+                {/* Vertical line from top */}
+                <motion.line
+                  x1="50%" y1="12%" x2="50%" y2="40%"
+                  stroke="url(#dottedLineGrad)" strokeWidth="1.5" strokeDasharray="4,6" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true }} transition={{ delay: 0.5, duration: 1 }}
+                />
+                {/* Top left diagonal */}
+                <motion.line
+                  x1="24%" y1="30%" x2="44%" y2="44%"
+                  stroke="url(#dottedLineGrad)" strokeWidth="1.5" strokeDasharray="4,6" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true }} transition={{ delay: 0.6, duration: 1 }}
+                />
+                {/* Top right diagonal */}
+                <motion.line
+                  x1="76%" y1="30%" x2="56%" y2="44%"
+                  stroke="url(#dottedLineGrad)" strokeWidth="1.5" strokeDasharray="4,6" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true }} transition={{ delay: 0.6, duration: 1 }}
+                />
+                {/* Bottom left diagonal */}
+                <motion.line
+                  x1="22%" y1="70%" x2="44%" y2="56%"
+                  stroke="url(#dottedLineGrad)" strokeWidth="1.5" strokeDasharray="4,6" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true }} transition={{ delay: 0.7, duration: 1 }}
+                />
+                {/* Bottom right diagonal */}
+                <motion.line
+                  x1="78%" y1="70%" x2="56%" y2="56%"
+                  stroke="url(#dottedLineGrad)" strokeWidth="1.5" strokeDasharray="4,6" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true }} transition={{ delay: 0.8, duration: 1 }}
+                />
+                {/* Vertical line to bottom */}
+                <motion.line
+                  x1="50%" y1="60%" x2="50%" y2="86%"
+                  stroke="url(#dottedLineGrad)" strokeWidth="1.5" strokeDasharray="4,6" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true }} transition={{ delay: 0.9, duration: 1 }}
+                />
+              </svg>
+
+              {/* Sleek placeholder bars */}
+              <div className="absolute left-3 top-12 space-y-2">
+                {[80, 60, 70].map((w, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 + i * 0.1 }}
+                    className="h-2 bg-slate-600/40 rounded-full"
+                    style={{ width: w }}
+                  />
+                ))}
+              </div>
+              <div className="absolute right-3 top-12 space-y-2">
+                {[70, 80, 50].map((w, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 + i * 0.1 }}
+                    className="h-2 bg-slate-600/40 rounded-full ml-auto"
+                    style={{ width: w }}
+                  />
+                ))}
+              </div>
+              <div className="absolute left-3 bottom-8 space-y-2">
+                {[60, 50].map((w, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5 + i * 0.1 }}
+                    className="h-2 bg-slate-600/40 rounded-full"
+                    style={{ width: w }}
+                  />
+                ))}
+              </div>
+              <div className="absolute right-3 bottom-8 space-y-2">
+                {[50, 70].map((w, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5 + i * 0.1 }}
+                    className="h-2 bg-slate-600/40 rounded-full ml-auto"
+                    style={{ width: w }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Content */}
+            <div className="p-8 lg:p-14 flex flex-col justify-center border-l border-slate-700/30">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 text-sm font-medium text-slate-200 border border-slate-500/40 rounded-full bg-slate-700/30 backdrop-blur-sm">
+                  <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" />
+                  AI Voice Agent
+                </div>
+                
+                <h3 className="text-4xl sm:text-5xl font-bold mb-6 text-white leading-tight tracking-tight">
+                  Lead maximizer
+                </h3>
+                
+                <p className="text-lg text-slate-300 mb-10 leading-relaxed">
+                  Get value from every lead with Xpectrum AI. It works through your full lead list — even old, ignored, or low-priority ones. Xpectrum AI has real conversations to see if there's a fit, often finding hidden opportunities. Don't let good leads slip away just because they didn't look promising at first.
+                </p>
+                
+                <motion.button
+                  whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(99, 102, 241, 0.3)' }}
+                  whileTap={{ scale: 0.98 }}
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-white font-semibold  transition-all border border-slate-500/30 shadow-lg"
+                >
+                  Book a demo
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </motion.button>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Main Grid */}
         <motion.div
           variants={containerVariants}
@@ -177,50 +408,10 @@ const Features = () => {
           className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
         >
           {/* Interruption-Aware Dialogue */}
-          <motion.div
-            variants={itemVariants}
-            className="group relative border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent p-8 hover:border-white/10 transition-all duration-300"
-          >
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold tracking-wider text-slate-200 mb-4">
-                INTERRUPTION-AWARE DIALOGUE
-              </h3>
-              <div className="flex items-center gap-3 text-base font-mono text-gray-100">
-                <span>Audio Stream</span>
-                <ArrowRight className="w-5 h-5" />
-                <span>LLM Context</span>
-                <ArrowRight className="w-5 h-5" />
-                <span>Response</span>
-              </div>
-            </div>
-            <div className="h-32 border border-slate-800 bg-slate-950/50 p-4 font-mono text-sm text-slate-300 space-y-2">
-              <div className="animate-pulse">Processing audio chunks...</div>
-              <div className="text-xs text-slate-400">Buffer: 16kHz | PCM 16-bit</div>
-              <div className="text-xs text-emerald-400">⚡ Latency: 275ms | Active: 2.3s</div>
-            </div>
-          </motion.div>
+        
 
           {/* Event Log */}
-          <motion.div
-            variants={itemVariants}
-            className="group relative border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent p-8 hover:border-white/10 transition-all duration-300"
-          >
-            <div className="space-y-4">
-              {eventLog.map((event, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3 text-base"
-                >
-                  <div className="w-2 h-2 mt-2 bg-slate-400 rounded-full" />
-                  <span className="font-mono text-gray-100">{event}</span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+         
 
           {/* Real-Time Agent State */}
           <motion.div
@@ -404,7 +595,24 @@ const Features = () => {
           {/* Human Handoff */}
        
         </motion.div>
-
+        <ScrollVelocityContainer className="w-full">
+        <ScrollVelocityRow baseVelocity={6} direction={1} className="py-4">
+          {IMAGES_ROW_A.map((src, idx) => (
+            <img
+              key={idx}
+              src={`${src}&ixlib=rb-4.0.3`}
+              alt="Unsplash sample"
+              width={240}
+              height={160}
+              loading="lazy"
+              decoding="async"
+              className="mx-4 inline-block h-40 w-60 rounded-lg object-cover shadow-sm"
+            />
+          ))}
+        </ScrollVelocityRow>
+        
+      </ScrollVelocityContainer>
+      
         {/* Conversation Flow */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -414,11 +622,11 @@ const Features = () => {
           className="border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent p-12 mb-6"
         >
           <div className="max-w-3xl">
-            <h3 className="text-4xl sm:text-5xl font-bold mb-6 text-white">
-              BUILT FOR LONG,
-              <br />
-              MESSY CONVERSATIONS
-            </h3>
+            <EncryptedText   encryptedClassName="text-neutral-500"
+        revealedClassName="dark:text-white text-black"
+        revealDelayMs={50} text="BUILT FOR LONG,
+              
+              MESSY CONVERSATIONS" className="text-4xl sm:text-5xl font-bold mb-6 text-white" />
             <p className="text-xl sm:text-2xl text-gray-200 mb-8 leading-relaxed">
               Real calls aren't clean. People interrupt, change their mind, go off-script. Our agents maintain conversational{' '}
               <span className="italic text-white">state</span> across turns, tools, and silence – without resetting context.
@@ -484,46 +692,7 @@ const Features = () => {
         </motion.div>
 
         {/* System Controls */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent p-12"
-        >
-          <div className="mb-10">
-            <div className="text-sm font-semibold tracking-wider text-slate-200 mb-6">
-              SYSTEM CONTROLS
-            </div>
-            <h3 className="text-3xl sm:text-4xl font-bold mb-8 text-white">Agent Config</h3>
-        </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-            {['Policy', 'Guardrails', 'Allowed actions', 'Failbacks'].map((control) => (
-              <div
-                key={control}
-                className="px-6 py-4 border border-slate-700 bg-slate-900/50 text-base font-mono text-gray-100 hover:bg-slate-800/50 transition-colors"
-              >
-                {control}
-      </div>
-    ))}
-  </div>
-          <div className="pt-10 border-t border-white/5">
-            <h4 className="text-2xl sm:text-3xl font-semibold mb-4 text-white">
-              Ready to build agents that hold up in production?
-            </h4>
-            <p className="text-base text-gray-300 mb-8">
-              Join 2,500+ companies processing 50M+ conversations monthly
-            </p>
-            <div className="flex flex-wrap gap-6">
-              <button className="px-8 py-4 text-lg bg-slate-700 text-white font-semibold hover:bg-slate-600 transition-colors">
-                Explore Documentation
-              </button>
-              <button className="px-8 py-4 text-lg border border-slate-600 text-white font-semibold hover:bg-slate-800/50 transition-colors">
-                Request Access
-              </button>
-            </div>
-          </div>
-        </motion.div>
+      
 </div>
 </section>
   );

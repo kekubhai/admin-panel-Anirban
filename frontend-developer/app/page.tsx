@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { Tinos ,Cormorant_Garamond } from 'next/font/google';
 import Features from './components/Features';
+import Products from './components/Products';
+import { TypingAnimation } from '@/components/ui/typing-animation';
 
 const tinos = Tinos({
   subsets: ['latin'],
@@ -43,9 +45,9 @@ export default function LandingPage() {
             
             {/* Main Heading */}
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tight ">
-              <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-4">
+              <TypingAnimation className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-4">
                 Build Voice Agents
-              </span>
+              </TypingAnimation>
               <br />
               <span className="bg-gradient-to-r from-slate-300 to-slate-500 bg-clip-text text-transparent">
                 That{' '}
@@ -82,6 +84,8 @@ export default function LandingPage() {
       </AuroraBackground>
 
       <Features />
+
+      <Products />
 
       {/* Stats Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-white/5">
