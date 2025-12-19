@@ -1,106 +1,50 @@
 'use client';
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Bot,
   Phone,
-  BarChart3,
   FileText,
-  MessageSquare,
   Clock,
-  LogOut,
-  User,
   Settings,
-  Shield,
-  Activity,
-  MoreHorizontal,
-  Zap,
-  Users,
-  Database,
-  Sun,
-  Moon,
-  Mail,
-  BookOpen
+  BookOpen,
+  Layers,
+  Mic,
+  Code,
+  Server,
+  GitBranch,
+  Megaphone,
+  HelpCircle,
+  Plus,
+  Upload,
+  Share2,
+  Trash2,
+  ExternalLink,
+  Play,
+  Save,
+  Search,
+  MoreVertical,
+  Copy
 } from 'lucide-react';
-// COMMENTED FOR DEV - to see landing page without auth
-// import { useAuthInfo, useLogoutFunction } from '@propelauth/react';
-import { SyncLoader } from 'react-spinners';
 import { useRouter } from 'next/navigation';
 
 import { OrgSetup } from '../components';
-import Navbar from '../components/Navbar';
-import ChatSidebar from '../components/ChatSidebar';
 import { MobileNav } from '../components';
 import { Sidebar } from '../components';
+import { useTabPersistence } from '@/hooks/useTabPersistence';
+import DashboardService from '@/service/dashboardService';
 import { useTheme } from '../contexts/ThemeContext';
-import { useTabPersistence } from '@/hooks/useTabPersistence';import DashboardService from '@/service/dashboardService';
+import { useAuthInfo } from '@propelauth/react';
 
-// Lazy load all tabs with dynamic imports
-const AgentsTab = dynamic(() => import('../components/AgentsTab'), {
-  ssr: false,
-  loading: () => <TabSkeleton />
-});
-
-const PhoneNumbersTab = dynamic(() => import('../components/PhoneNumbersTab'), {
-  ssr: false,
-  loading: () => <TabSkeleton />
-});
-
-const SMSTab = dynamic(() => import('../components/SMSTab'), {
-  ssr: false,
-  loading: () => <TabSkeleton />
-});
-
-const WhatsAppTab = dynamic(() => import('../components/WhatsAppTab'), {
-  ssr: false,
-  loading: () => <TabSkeleton />
-});
-
-const GmailTab = dynamic(() => import('../components/GmailTab'), {
-  ssr: false,
-  loading: () => <TabSkeleton />
-});
-
-const KnowledgeBaseTab = dynamic(() => import('../components/knowledge-base/KnowledgeBaseTab'), {
-  ssr: false,
-  loading: () => <TabSkeleton />
-});
-
-const ConversationLogsTab = dynamic(() => import('../components/ConversationLogsTab'), {
-  ssr: false,
-  loading: () => <TabSkeleton />
-});
-
-// Loading skeleton component for tabs
-function TabSkeleton() {
-  const { isDarkMode } = useTheme();
-  return (
-    <div className={`max-w-7xl mx-auto ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-[400px]`}>
-      <div className={`rounded-2xl p-8 border ${isDarkMode ? 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border-gray-700/50' : 'bg-white border-gray-200 shadow-lg'}`}>
-        <div className="animate-pulse space-y-6">
-          <div className="flex items-center gap-4">
-            <div className={`h-12 w-12 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-            <div className="flex-1 space-y-2">
-              <div className={`h-6 w-48 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-              <div className={`h-4 w-32 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <div className={`h-4 w-full rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-            <div className={`h-4 w-5/6 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-            <div className={`h-4 w-4/6 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className={`h-32 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+// Lazy load tabs
+const AgentsTab = dynamic(() => import('../components/AgentsTab'), { ssr: false });
+const PhoneNumbersTab = dynamic(() => import('../components/PhoneNumbersTab'), { ssr: false });
+const SMSTab = dynamic(() => import('../components/SMSTab'), { ssr: false });
+const WhatsAppTab = dynamic(() => import('../components/WhatsAppTab'), { ssr: false });
+const GmailTab = dynamic(() => import('../components/GmailTab'), { ssr: false });
+const KnowledgeBaseTab = dynamic(() => import('../components/knowledge-base/KnowledgeBaseTab'), { ssr: false });
+const ConversationLogsTab = dynamic(() => import('../components/ConversationLogsTab'), { ssr: false });
 
 // Custom WhatsApp icon component
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -113,226 +57,327 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Navigation items for top navbar
+// Navigation items matching the screenshot
 const navigationItems = [
-  { name: 'Agents', icon: Bot, color: 'from-green-500 to-emerald-600' },
-  { name: 'Phone Numbers', icon: Phone, color: 'from-green-500 to-emerald-600' },
-  { name: 'SMS', icon: MessageSquare, color: 'from-green-500 to-emerald-600' },
-  { name: 'WhatsApp', icon: WhatsAppIcon, color: 'from-green-500 to-emerald-600' },
-  { name: 'Email', icon: Mail, color: 'from-green-500 to-emerald-600' },
-  { name: 'Knowledge Base', icon: BookOpen, color: 'from-green-500 to-emerald-600' },
-  { name: 'Conversation Logs', icon: FileText, color: 'from-green-500 to-emerald-600' },
+  { name: 'Agent Setup', icon: Bot, color: '' },
+  { name: 'Call History', icon: Clock, color: '' },
+  { name: 'My numbers', icon: Phone, color: '' },
+  { name: 'Knowledge Base', icon: BookOpen, color: '' },
+  { name: 'Batches', icon: Layers, color: '' },
+  { name: 'Voice Lab', icon: Mic, color: '' },
+  { name: 'Developers', icon: Code, color: '' },
+  { name: 'Providers', icon: Server, color: '' },
+  { name: 'Workflows', icon: GitBranch, color: '' },
+  { name: 'Campaigns', icon: Megaphone, color: '' },
+  { name: 'Documentation', icon: FileText, color: '' },
 ];
 
 export default function DeveloperDashboard() {
-  const [activeNavItem, handleNavItemChange] = useTabPersistence<string>('mainNavigation', 'Agents');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
-
-  const { isDarkMode, toggleTheme } = useTheme();
-
-  // Profile dropdown state
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  // COMMENTED FOR DEV - to see landing page without auth
-  // const { user, isLoggedIn, userClass, loading } = useAuthInfo();
-  // const logout = useLogoutFunction();
+  const [activeNavItem, handleNavItemChange] = useTabPersistence<string>('mainNavigation', 'Agent Setup');
   
-  // MOCK VALUES FOR DEVELOPMENT
-  const user = null;
-  const isLoggedIn = false;
-  const userClass = null;
-  const loading = false;
-  const logout = async (_redirectOnLogout?: boolean) => { window.location.href = '/login'; };
-  const router = useRouter();
+  const handleNavItemClick = (tab: string) => {
+    handleNavItemChange(tab);
+  };
 
-  // Organization setup state
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Default open to match screenshot
+  const { isDarkMode } = useTheme();
+  
+  // Auth state
+  const { userClass } = useAuthInfo();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const logout = async (_redirectOnLogout?: boolean) => { window.location.href = '/login'; };
+
+  // Org state
   const [showOrgSetup, setShowOrgSetup] = useState(false);
   const [orgs, setOrgs] = useState<any[]>([]);
   const [orgSetupComplete, setOrgSetupComplete] = useState(false);
   const [organizationName, setOrganizationName] = useState<string>('');
 
-  // Dashboard statistics state
-  const [dashboardStats, setDashboardStats] = useState<any>({
-    totalAgents: 0,
-    totalPhoneNumbers: 0,
-    totalWhatsAppNumbers: 0,
-    totalEmails: 0
-  });
-  const [statsLoading, setStatsLoading] = useState(true);
+  // Mock Data for Hardcoded View
+  const agentsList = [
+    { id: '1', name: 'Zynvo Agent' },
+    { id: '2', name: 'My New Agent' }
+  ];
+  const [selectedAgentId, setSelectedAgentId] = useState('2');
 
-  // Redirect to login if not authenticated (like main frontend)
-  // useEffect(() => {
-  //   if (!loading && !isLoggedIn) {
-  //     window.location.href = "/login";
-  //   }
-  // }, [loading, isLoggedIn]);
-
-  // // Don't render anything if not authenticated
-  // if (!loading && !isLoggedIn) {
-  //   return null;
-  // }
-
-  // Organization setup logic - only for first-time users
+  // Organization setup logic
   useEffect(() => {
     if (!loading && userClass) {
       const orgs = userClass.getOrgs?.() || [];
       setOrgs(orgs);
-
-      // Only show organization setup if user has no organizations (first-time user)
       if (orgs.length === 0) {
         setShowOrgSetup(true);
         setOrgSetupComplete(false);
       } else {
-        // User already has organization(s), proceed to dashboard
         setShowOrgSetup(false);
         setOrgSetupComplete(true);
+        const org = orgs[0] as any;
+        setOrganizationName(org.orgName || org.name || 'Organization');
       }
     }
   }, [loading, userClass]);
 
-  // Get organization name from user context
-  useEffect(() => {
-    if (userClass) {
-      const orgs = userClass.getOrgs?.() || [];
-      if (orgs.length > 0) {
-        const org = orgs[0] as any;
-        const orgName = org.orgName || org.name || '';
-        setOrganizationName(orgName);
-      } else {
-        setOrganizationName('Organization Name');
-      }
-    } else {
-      setOrganizationName('Organization Name');
-    }
-  }, [userClass]);
-
-  // Fetch dashboard statistics when organization is available
-  useEffect(() => {
-    const fetchDashboardStats = async () => {
-      if (!loading && userClass && orgSetupComplete) {
-        const orgs = userClass.getOrgs?.() || [];
-        if (orgs.length > 0) {
-          const currentOrg = orgs[0]; // Get the first organization
-          const organizationInfo: any = {
-            orgId: currentOrg.orgId,
-            orgName: (currentOrg as any).orgName || (currentOrg as any).name
-          };
-
-          setStatsLoading(true);
-          try {
-            // First run debug to see what's happening
-            await DashboardService.debugDashboardStats(organizationInfo);
-
-            // Then get the actual stats
-            const result = await DashboardService.getDashboardStats(organizationInfo);
-            if (result.success && result.data) {
-              setDashboardStats(result.data);
-            }
-          } catch (error) {
-          } finally {
-            setStatsLoading(false);
-          }
-        }
-      }
-    };
-
-    fetchDashboardStats();
-  }, [loading, userClass, orgSetupComplete]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Handle navigation item click
-  const handleNavItemClick = (itemName: string) => {
-    handleNavItemChange(itemName);
-  };
-
   // Render content based on active navigation item
   const renderContent = () => {
+    if (activeNavItem === 'Agent Setup') {
+      return (
+        <div className="h-full flex flex-col gap-4">
+          {/* Top Header */}
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Agent setup</h1>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Fine tune your agents</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-gray-50 border-gray-200 text-gray-700'} text-sm font-medium`}>
+                Available balance: <span className="font-bold">$4.95</span>
+              </div>
+              <button className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'} text-sm font-medium flex items-center gap-2`}>
+                <span className="font-bold">$</span> Add more funds
+              </button>
+              <button className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'} text-sm font-medium flex items-center gap-2`}>
+                <HelpCircle className="h-4 w-4" /> Help
+              </button>
+            </div>
+          </div>
+
+          {/* Banner */}
+          <div className="bg-blue-50 border border-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm flex items-center justify-between">
+            <span>You're currently on a trial plan, which limits outbound calls to your <a href="#" className="underline font-medium">verified phone numbers</a>. To unlock full calling access, please upgrade by adding funds to your account.</span>
+          </div>
+
+          {/* Main 3-Column Layout */}
+          <div className="flex-1 grid grid-cols-12 gap-6 min-h-0">
+            
+            {/* Left Column: Agent List */}
+            <div className="col-span-3 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h2 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Your Agents</h2>
+              </div>
+              
+              <div className="flex gap-2">
+                <button className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 text-sm font-medium ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <Upload className="h-4 w-4" /> Import
+                </button>
+                <button className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 text-sm font-medium ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <Plus className="h-4 w-4" /> New Agent
+                </button>
+              </div>
+
+              <div className={`relative`}>
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
+                <input 
+                  type="text" 
+                  placeholder="Search agents..." 
+                  className={`w-full pl-9 pr-4 py-2 rounded-lg border text-sm ${isDarkMode ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'}`}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2 overflow-y-auto">
+                {agentsList.map(agent => (
+                  <button 
+                    key={agent.id}
+                    onClick={() => setSelectedAgentId(agent.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      selectedAgentId === agent.id 
+                        ? (isDarkMode ? 'bg-slate-800 border-slate-600 text-white shadow-sm' : 'bg-blue-50 border-blue-200 text-blue-900 shadow-sm')
+                        : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50')
+                    }`}
+                  >
+                    <span className="font-medium">{agent.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Middle & Right Columns Merged: Agent Details & Actions */}
+            <div className="col-span-9 flex flex-col gap-6">
+              
+              {/* Top Card: Header Info + Call Buttons */}
+              <div className={`p-6 rounded-xl border shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-4 mb-2">
+                      <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Zynvo Agent</h2>
+                      <div className="flex gap-2">
+                        <button className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-2 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-gray-200 text-gray-600'}`}>
+                          <Copy className="h-3 w-3" /> Agent ID
+                        </button>
+                        <button className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-2 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-gray-200 text-gray-600'}`}>
+                          <Share2 className="h-3 w-3" /> Share
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm mb-4">
+                      <span className={isDarkMode ? 'text-slate-400' : 'text-gray-500'}>Cost per min: ~ $0.098</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-xs">
+                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>Transcriber</span></div>
+                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-orange-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>LLM</span></div>
+                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>Voice</span></div>
+                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>Telephony</span></div>
+                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-blue-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>Platform</span></div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-end gap-3">
+                    <button className="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm transition-colors">
+                      <Phone className="h-4 w-4" /> Get call from agent
+                    </button>
+                    <button className={`py-2.5 px-6 rounded-lg text-sm font-bold flex items-center gap-2 border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'}`}>
+                      <Phone className="h-4 w-4" /> Set inbound agent
+                    </button>
+                    <a href="#" className="text-xs text-blue-500 hover:underline flex items-center gap-1">
+                      Purchase phone numbers <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Section: Content + Right Actions */}
+              <div className="grid grid-cols-12 gap-6 flex-1 min-h-0">
+                
+                {/* Main Content (Tabs + Inputs) */}
+                <div className={`col-span-8 rounded-xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}>
+                  {/* Tabs */}
+                  <div className={`px-2 border-b ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
+                    <div className="flex gap-1 overflow-x-auto">
+                      {[
+                        { name: 'Agent', icon: FileText },
+                        { name: 'LLM', icon: Settings },
+                        { name: 'Audio', icon: Mic },
+                        { name: 'Engine', icon: Settings },
+                        { name: 'Call', icon: Phone },
+                        { name: 'Tools', icon: Layers },
+                        { name: 'Analytics', icon: BookOpen },
+                        { name: 'Inbound', icon: Phone }
+                      ].map((tab, i) => (
+                        <button 
+                          key={tab.name}
+                          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                            i === 0 
+                              ? 'border-blue-500 text-blue-600' 
+                              : `border-transparent ${isDarkMode ? 'text-slate-400 hover:text-slate-200' : 'text-gray-500 hover:text-gray-700'}`
+                          }`}
+                        >
+                          <tab.icon className="h-4 w-4" />
+                          {tab.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6 flex-1 overflow-y-auto">
+                    <div className="space-y-6">
+                      <div>
+                        <label className={`block text-sm font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Agent Welcome Message</label>
+                        <input 
+                          type="text" 
+                          defaultValue="Heyy, are you free for a short survey about ZynvoSocial?"
+                          className={`w-full p-3 rounded-lg border text-sm ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                        />
+                        <p className={`mt-1 text-xs ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>This will be the initial message from the agent. You can use variables here using {'{variable_name}'}</p>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <label className={`block text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Agent Prompt</label>
+                          <button className={`text-xs px-2 py-1 rounded border flex items-center gap-1 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-gray-200 text-gray-600'}`}>
+                            <Settings className="h-3 w-3" /> AI Edit
+                          </button>
+                        </div>
+                        <div className={`w-full p-4 rounded-lg border text-sm font-mono leading-relaxed h-64 overflow-y-auto ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-gray-200 text-gray-700'}`}>
+                          <p className="mb-4 font-bold">Personality</p>
+                          <p className="mb-4">Zynvo Assist is friendly, youthful, and campus-vibe conversational.</p>
+                          <p className="mb-4">They speak clearly, calmly, and positively, making users—especially students—feel welcomed and supported during onboarding calls.</p>
+                          <p>They naturally switch between English and Hindi based on the user's preference. Tone stays warm, respectful, and helpful, never robotic or sales-y.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Actions Sidebar */}
+                <div className="col-span-4 flex flex-col gap-4">
+                  <button className={`w-full py-3 px-4 rounded-xl border text-sm font-bold flex items-center justify-between gap-2 transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm'}`}>
+                    See all call logs <ExternalLink className="h-4 w-4" />
+                  </button>
+
+                  <div className={`p-4 rounded-xl border flex flex-col gap-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200 shadow-sm'}`}>
+                    <div className="flex gap-2">
+                      <button className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-colors">
+                        <Save className="h-4 w-4" /> Save agent
+                      </button>
+                      <button className={`p-2.5 rounded-lg border flex items-center justify-center ${isDarkMode ? 'bg-slate-800 border-slate-700 text-red-400 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-500 hover:text-red-500 hover:bg-red-50'}`}>
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <p className={`text-xs text-center ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Last updated a month ago</p>
+                  </div>
+
+                  <div className={`p-4 rounded-xl border flex flex-col gap-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200 shadow-sm'}`}>
+                    <button className={`w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400 hover:bg-slate-700' : 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100'}`}>
+                      Chat with agent
+                    </button>
+                    <p className={`text-xs text-center flex items-center justify-center gap-1 ${isDarkMode ? 'text-amber-500' : 'text-amber-600'}`}>
+                      <span className="text-xs">💡</span> Chat is the fastest way to test and refine the agent.
+                    </p>
+                    <div className={`h-px w-full my-1 ${isDarkMode ? 'bg-slate-800' : 'bg-gray-100'}`}></div>
+                    <button className={`w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                      Test via <span className="text-blue-500">web call</span>
+                    </button>
+                    <p className={`text-xs text-center ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Test your agent with voice calls</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+
+    // Fallback for other tabs
     switch (activeNavItem) {
-      case 'Agents':
-        return <AgentsTab />;
-
-      case 'Phone Numbers':
-        return <PhoneNumbersTab />;
-
-      case 'SMS':
-        return <SMSTab />;
-
-      case 'WhatsApp':
-        return <WhatsAppTab />;
-
-      case 'Email':
-        return <GmailTab />;
-
-      case 'Knowledge Base':
-        return <KnowledgeBaseTab />;
-
-      case 'Conversation Logs':
-        // Pass both orgId (UUID) and orgName (name) - agents use orgName
-        return <ConversationLogsTab 
-          organizationId={orgs.length > 0 ? (orgs[0] as any).orgName || (orgs[0] as any).name || orgs[0].orgId : undefined} 
-        />;
-
+      case 'Call History': return <div className="p-8 text-center">Call History Content</div>;
+      case 'My numbers': return <PhoneNumbersTab />;
+      case 'Knowledge Base': return <KnowledgeBaseTab />;
+      case 'Documentation': return <ConversationLogsTab organizationId={orgs.length > 0 ? (orgs[0] as any).orgName || (orgs[0] as any).name || orgs[0].orgId : undefined} />;
       default:
         return (
           <div className="max-w-7xl mx-auto">
-            <div className={`rounded-2xl p-8 border ${isDarkMode ? 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-900 shadow-lg'}`}>
+            <div className={`p-8 border rounded-xl ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-gray-200 text-gray-900'}`}>
               <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-gradient-to-r from-gray-600 to-gray-800 rounded-xl">
-                  <Settings className="h-6 w-6 text-gray-300" />
+                <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-gray-100 border-gray-200'}`}>
+                  <Settings className={`h-6 w-6 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`} />
                 </div>
-                <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{activeNavItem}</h2>
+                <h2 className="text-2xl font-semibold">{activeNavItem}</h2>
               </div>
-              <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>This section is under development and will be available soon.</p>
+              <p className={isDarkMode ? 'text-slate-400' : 'text-gray-500'}>This section is under development and will be available soon.</p>
             </div>
           </div>
         );
     }
   };
 
-  if (loggingOut) {
+  if (loggingOut || loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', width: '100vw', background: isDarkMode ? '#111827' : 'white', zIndex: 9999, position: 'fixed', top: 0, left: 0 }}>
+      <div className={`fixed inset-0 z-[9999] flex items-center justify-center ${isDarkMode ? 'bg-slate-950' : 'bg-white'}`}>
         <div className="text-center">
-          <div className="relative">
-            <div className="w-16 h-16 border-4 border-green-500/20 border-t-green-500 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-green-400 rounded-full animate-spin" style={{ animationDuration: '1.5s' }}></div>
+          <div className="relative mx-auto w-16 h-16">
+            <div className={`w-16 h-16 border-4 border-t-blue-500 rounded-full animate-spin ${isDarkMode ? 'border-slate-800' : 'border-gray-200'}`}></div>
           </div>
-          <p className={`mt-6 font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Logging out...</p>
+          <p className={`mt-6 font-medium ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Loading...</p>
         </div>
       </div>
     );
   }
 
-  // Show loading while checking authentication
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', width: '100vw', background: isDarkMode ? '#111827' : 'white', zIndex: 9999, position: 'fixed', top: 0, left: 0 }}>
-        <div className="text-center">
-          <div className="relative">
-            <div className="w-16 h-16 border-4 border-green-500/20 border-t-green-500 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-green-400 rounded-full animate-spin" style={{ animationDuration: '1.5s' }}></div>
-          </div>
-          <p className={`mt-6 font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show organization setup modal only for first-time users
   if (showOrgSetup) {
     return (
       <OrgSetup onOrgCreated={() => {
@@ -344,7 +389,7 @@ export default function DeveloperDashboard() {
 
   return (
     <>
-      <div className={`min-h-screen flex ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-black' : 'bg-gray-50'}`}>
+      <div className={`min-h-screen flex font-sans ${isDarkMode ? 'bg-slate-950 text-slate-200' : 'bg-gray-50 text-gray-900'}`}>
         {/* Mobile Navigation */}
         <MobileNav
           activeTab={activeNavItem}
@@ -354,14 +399,11 @@ export default function DeveloperDashboard() {
           onLogout={async () => {
             try {
               setLoggingOut(true);
-              // Clear chat history before logout
               localStorage.removeItem('chatMessages');
               await logout(true);
-              // Redirect to login page
               window.location.href = '/login';
             } catch (error) {
               setLoggingOut(false);
-              // Force redirect even if logout fails
               window.location.href = '/login';
             }
           }}
@@ -377,53 +419,44 @@ export default function DeveloperDashboard() {
           onLogout={async () => {
             try {
               setLoggingOut(true);
-              // Clear chat history before logout
               localStorage.removeItem('chatMessages');
               await logout(true);
-              // Redirect to login page
               window.location.href = '/';
             } catch (error) {
               setLoggingOut(false);
-              // Force redirect even if logout fails
               window.location.href = '/';
             }
           }}
         />
 
         {/* Main Content Area */}
-        <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'} p-3 sm:p-4 lg:p-6`}>
+        <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} p-6 h-screen overflow-hidden flex flex-col`}>
           {orgSetupComplete ? renderContent() : (
-            <div className="flex items-center justify-center h-64">
-              <div className={`text-center rounded-xl shadow-sm border p-8 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                }`}>
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'
-                  }`}>
-                  <Settings className={`w-8 h-8 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <div className="flex items-center justify-center h-full">
+              <div className={`text-center border p-8 rounded-xl ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-gray-200'}`}>
+                <div className={`w-16 h-16 flex items-center justify-center mx-auto mb-4 border rounded-full ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-blue-50 border-blue-100'}`}>
+                  <Settings className={`w-8 h-8 ${isDarkMode ? 'text-slate-400' : 'text-blue-500'}`} />
                 </div>
-                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>
                   Welcome to Developer Dashboard
                 </h3>
-                <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p className={`mb-4 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
                   As a new user, please create your organization to get started
-                </p>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  You'll need to create an organization before accessing the dashboard features.
                 </p>
               </div>
             </div>
           )}
         </main>
 
+        {/* Floating Help Button */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <button className="bg-slate-900 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-colors border border-slate-700">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="font-medium text-sm">Talk to us</span>
+          </button>
+        </div>
+
       </div>
-      <style jsx global>{`
-        @keyframes fade-in-down {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-down {
-          animation: fade-in-down 0.2s ease-out;
-        }
-      `}</style>
     </>
   );
 }
