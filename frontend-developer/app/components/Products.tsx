@@ -7,6 +7,8 @@ import React from 'react';
 import { CalendarCheck2 } from 'lucide-react';
 import { DotPattern } from '@/components/ui/dot-pattern';
 import { cn } from '@/lib/utils';
+import { AnimatedList } from '@/components/ui/animated-list';
+import { AnimatedListDemo } from './AnimatedListsection';
 const Products = () => {
   const products = [
     {
@@ -183,6 +185,8 @@ const Products = () => {
             </motion.button>
           </div>
         </motion.div>
+
+    
 
         {/* Features Grid - Image Style Design */}
         <div className="mb-32">
