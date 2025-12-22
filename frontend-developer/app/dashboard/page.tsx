@@ -37,6 +37,13 @@ import DashboardService from '@/service/dashboardService';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuthInfo } from '@propelauth/react';
 
+import { AvailableBalance } from '../components/dashboard/AvailableBalance';
+import { VoiceAgentHeader } from '../components/dashboard/VoiceAgentHeader';
+import { AgentLogs } from '../components/dashboard/AgentLogs';
+import { AgentActions } from '../components/dashboard/AgentActions';
+import { AgentList } from '../components/dashboard/AgentList';
+import { AgentContent } from '../components/dashboard/AgentContent';
+
 // Lazy load tabs
 const AgentsTab = dynamic(() => import('../components/AgentsTab'), { ssr: false });
 const PhoneNumbersTab = dynamic(() => import('../components/PhoneNumbersTab'), { ssr: false });
@@ -129,17 +136,7 @@ export default function DeveloperDashboard() {
               <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Agent setup</h1>
               <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Fine tune your agents</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-gray-50 border-gray-200 text-gray-700'} text-sm font-medium`}>
-                Available balance: <span className="font-bold">$4.95</span>
-              </div>
-              <button className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'} text-sm font-medium flex items-center gap-2`}>
-                <span className="font-bold">$</span> Add more funds
-              </button>
-              <button className={`px-4 py-2 rounded-lg border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'} text-sm font-medium flex items-center gap-2`}>
-                <HelpCircle className="h-4 w-4" /> Help
-              </button>
-            </div>
+            <AvailableBalance />
           </div>
 
           {/* Banner */}
@@ -152,186 +149,31 @@ export default function DeveloperDashboard() {
             
             {/* Left Column: Agent List */}
             <div className="col-span-3 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <h2 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Your Agents</h2>
-              </div>
-              
-              <div className="flex gap-2">
-                <button className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 text-sm font-medium ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
-                  <Upload className="h-4 w-4" /> Import
-                </button>
-                <button className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 text-sm font-medium ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
-                  <Plus className="h-4 w-4" /> New Agent
-                </button>
-              </div>
-
-              <div className={`relative`}>
-                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
-                <input 
-                  type="text" 
-                  placeholder="Search agents..." 
-                  className={`w-full pl-9 pr-4 py-2 rounded-lg border text-sm ${isDarkMode ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'}`}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2 overflow-y-auto">
-                {agentsList.map(agent => (
-                  <button 
-                    key={agent.id}
-                    onClick={() => setSelectedAgentId(agent.id)}
-                    className={`p-3 rounded-lg border text-left transition-all ${
-                      selectedAgentId === agent.id 
-                        ? (isDarkMode ? 'bg-slate-800 border-slate-600 text-white shadow-sm' : 'bg-blue-50 border-blue-200 text-blue-900 shadow-sm')
-                        : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50')
-                    }`}
-                  >
-                    <span className="font-medium">{agent.name}</span>
-                  </button>
-                ))}
-              </div>
+              <AgentList 
+                agents={agentsList} 
+                selectedId={selectedAgentId} 
+                onSelect={setSelectedAgentId} 
+              />
             </div>
 
             {/* Middle & Right Columns Merged: Agent Details & Actions */}
             <div className="col-span-9 flex flex-col gap-6">
               
               {/* Top Card: Header Info + Call Buttons */}
-              <div className={`p-6 rounded-xl border shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-4 mb-2">
-                      <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Zynvo Agent</h2>
-                      <div className="flex gap-2">
-                        <button className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-2 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-gray-200 text-gray-600'}`}>
-                          <Copy className="h-3 w-3" /> Agent ID
-                        </button>
-                        <button className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-2 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-gray-200 text-gray-600'}`}>
-                          <Share2 className="h-3 w-3" /> Share
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm mb-4">
-                      <span className={isDarkMode ? 'text-slate-400' : 'text-gray-500'}>Cost per min: ~ $0.098</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-xs">
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>Transcriber</span></div>
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-orange-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>LLM</span></div>
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>Voice</span></div>
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>Telephony</span></div>
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-blue-500"></div> <span className={isDarkMode ? 'text-slate-300' : 'text-gray-600'}>Platform</span></div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-3">
-                    <button className="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm transition-colors">
-                      <Phone className="h-4 w-4" /> Get call from agent
-                    </button>
-                    <button className={`py-2.5 px-6 rounded-lg text-sm font-bold flex items-center gap-2 border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'}`}>
-                      <Phone className="h-4 w-4" /> Set inbound agent
-                    </button>
-                    <a href="#" className="text-xs text-blue-500 hover:underline flex items-center gap-1">
-                      Purchase phone numbers <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                </div>
-              </div>
+              <VoiceAgentHeader />
 
               {/* Bottom Section: Content + Right Actions */}
               <div className="grid grid-cols-12 gap-6 flex-1 min-h-0">
                 
                 {/* Main Content (Tabs + Inputs) */}
-                <div className={`col-span-8 rounded-xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}>
-                  {/* Tabs */}
-                  <div className={`px-2 border-b ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
-                    <div className="flex gap-1 overflow-x-auto">
-                      {[
-                        { name: 'Agent', icon: FileText },
-                        { name: 'LLM', icon: Settings },
-                        { name: 'Audio', icon: Mic },
-                        { name: 'Engine', icon: Settings },
-                        { name: 'Call', icon: Phone },
-                        { name: 'Tools', icon: Layers },
-                        { name: 'Analytics', icon: BookOpen },
-                        { name: 'Inbound', icon: Phone }
-                      ].map((tab, i) => (
-                        <button 
-                          key={tab.name}
-                          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
-                            i === 0 
-                              ? 'border-blue-500 text-blue-600' 
-                              : `border-transparent ${isDarkMode ? 'text-slate-400 hover:text-slate-200' : 'text-gray-500 hover:text-gray-700'}`
-                          }`}
-                        >
-                          <tab.icon className="h-4 w-4" />
-                          {tab.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6 flex-1 overflow-y-auto">
-                    <div className="space-y-6">
-                      <div>
-                        <label className={`block text-sm font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Agent Welcome Message</label>
-                        <input 
-                          type="text" 
-                          defaultValue="Heyy, are you free for a short survey about ZynvoSocial?"
-                          className={`w-full p-3 rounded-lg border text-sm ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                        />
-                        <p className={`mt-1 text-xs ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>This will be the initial message from the agent. You can use variables here using {'{variable_name}'}</p>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between items-center mb-2">
-                          <label className={`block text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Agent Prompt</label>
-                          <button className={`text-xs px-2 py-1 rounded border flex items-center gap-1 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-gray-200 text-gray-600'}`}>
-                            <Settings className="h-3 w-3" /> AI Edit
-                          </button>
-                        </div>
-                        <div className={`w-full p-4 rounded-lg border text-sm font-mono leading-relaxed h-64 overflow-y-auto ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-gray-200 text-gray-700'}`}>
-                          <p className="mb-4 font-bold">Personality</p>
-                          <p className="mb-4">Zynvo Assist is friendly, youthful, and campus-vibe conversational.</p>
-                          <p className="mb-4">They speak clearly, calmly, and positively, making users—especially students—feel welcomed and supported during onboarding calls.</p>
-                          <p>They naturally switch between English and Hindi based on the user's preference. Tone stays warm, respectful, and helpful, never robotic or sales-y.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div className="col-span-8 h-full">
+                  <AgentContent />
                 </div>
 
                 {/* Right Actions Sidebar */}
                 <div className="col-span-4 flex flex-col gap-4">
-                  <button className={`w-full py-3 px-4 rounded-xl border text-sm font-bold flex items-center justify-between gap-2 transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm'}`}>
-                    See all call logs <ExternalLink className="h-4 w-4" />
-                  </button>
-
-                  <div className={`p-4 rounded-xl border flex flex-col gap-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200 shadow-sm'}`}>
-                    <div className="flex gap-2">
-                      <button className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-colors">
-                        <Save className="h-4 w-4" /> Save agent
-                      </button>
-                      <button className={`p-2.5 rounded-lg border flex items-center justify-center ${isDarkMode ? 'bg-slate-800 border-slate-700 text-red-400 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-500 hover:text-red-500 hover:bg-red-50'}`}>
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <p className={`text-xs text-center ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Last updated a month ago</p>
-                  </div>
-
-                  <div className={`p-4 rounded-xl border flex flex-col gap-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200 shadow-sm'}`}>
-                    <button className={`w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400 hover:bg-slate-700' : 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100'}`}>
-                      Chat with agent
-                    </button>
-                    <p className={`text-xs text-center flex items-center justify-center gap-1 ${isDarkMode ? 'text-amber-500' : 'text-amber-600'}`}>
-                      <span className="text-xs">💡</span> Chat is the fastest way to test and refine the agent.
-                    </p>
-                    <div className={`h-px w-full my-1 ${isDarkMode ? 'bg-slate-800' : 'bg-gray-100'}`}></div>
-                    <button className={`w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
-                      Test via <span className="text-blue-500">web call</span>
-                    </button>
-                    <p className={`text-xs text-center ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Test your agent with voice calls</p>
-                  </div>
+                  <AgentLogs />
+                  <AgentActions />
                 </div>
 
               </div>
